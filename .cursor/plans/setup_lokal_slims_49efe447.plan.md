@@ -4,19 +4,19 @@ overview: Menyambungkan fork SLiMS 9.8.0 ini ke database lokal yang sudah diimpo
 todos:
   - id: check-runtime
     content: Cek PHP 8.1+, ekstensi wajib, dan koneksi MySQL ke db-dev-neopustaka2
-    status: pending
+    status: completed
   - id: composer
     content: Jalankan composer install agar vendor/autoload.php ada
-    status: pending
+    status: completed
   - id: local-config
     content: Buat config/database.php dan config/env.php (development), gitignored
-    status: pending
+    status: completed
   - id: writable-dirs
     content: Pastikan files, images, repository, dan cache bisa ditulis
-    status: pending
+    status: completed
   - id: serve
     content: Jalankan php -S 127.0.0.1:8080 dan pastikan OPAC serta /admin/ merespons
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -35,14 +35,14 @@ Database `db-dev-neopustaka2` sudah berisi data staging, jadi installer tidak di
 
 1. Cek PHP, ekstensi, dan koneksi MySQL ke `127.0.0.1:3306` / database `db-dev-neopustaka2` / user `root`. Password root tidak ditulis di rencana ini; kalau koneksi ditolak, password diminta sekali lalu hanya disimpan di `config/database.php`.
 2. `composer install` di root proyek agar `vendor/autoload.php` terbentuk.
-3. Buat [`config/database.php`](config/database.php) dari [`config/database.sample.php`](config/database.sample.php):
+3. Buat [`config/database.php`](config/database.php) dari [`config/database.sample.php`](config/database.sample.php): storage engine nya ganti jadi innodb!
 
 ```php
 'host' => '127.0.0.1',
 'database' => 'db-dev-neopustaka2',
-'port' => 3306,
+'port' => 3666,
 'username' => 'root',
-'password' => '<password lokal>',
+'password' => 'satuduatiga456TujuhDelapan9',
 'options' => ['storage_engine' => 'MyISAM'],
 ```
 
