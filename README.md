@@ -1,32 +1,86 @@
-SLiMS 9 Bulian
-===============
-SENAYAN Library Management System (SLiMS) version 9 Codename Bulian
+# NeoPustaka STIE
 
-SLiMS is free open source software for library resources management
-(such as books, journals, digital document and other library materials)
-and administration such as collection circulation, collection management,
-membership, stock taking and many other else.
+Fork [SLiMS 9 Bulian](https://github.com/slims/slims9_bulian) `v9.8.0` untuk Perpustakaan STIE. Aplikasi mengelola koleksi, sirkulasi, keanggotaan, dan stok opname.
 
-SLiMS is licensed under GNU GPL version 3. Please read "GPL-3.0 License.txt"
-to learn more about GPL.
+SLiMS dilisensikan di bawah GNU GPL versi 3. Baca `GPL-3.0 License.txt`.
 
-### System Requirements
-- PHP version >= 8.1;
-- MySQL version 5.7 and or MariaDB version 10.3;
-- PHP GD enabled
-- PHP gettext enabled
-- PHP mbstring enabled
+## Kebutuhan
 
-### Running Docker Development
+- PHP >= 8.1, dengan ekstensi `gd` (GIF, JPEG, PNG), `pdo_mysql`, `mbstring`, `gettext`, dan `fileinfo`
+- MariaDB atau MySQL 5.7+
+- Composer
 
-Using docker for running requires Docker Desktop service, as it will use Docker to create the database.
-Before run docker compose copy .env.example to .env for setting http port and maria db (db) port 
-can be change on .env
+## Pengembangan lokal
 
-You can run the test using this command :
+Database lokal sudah berisi impor dari staging. Jangan menjalankan `/install/`, dan jangan memakai `docker compose` di repo ini. Compose itu membuat MariaDB baru bernama `senayan`, bukan database STIE.
 
-```shell
-docker compose up -d --build
+| | |
+| --- | --- |
+| Host | `127.0.0.1` |
+| Port | `3666` |
+| Database | `db-dev-neopustaka2` |
+| User | `root` |
+| Storage engine | `InnoDB` |
+
+### 1. Dependency
+
+```bash
+composer install
 ```
 
-Setting docker default can be change on docker-compose.yml
+### 2. Konfigurasi
+
+Salin sampel lalu isi koneksi lokal. Kedua file ini diabaikan Git.
+
+```bash
+cp config/database.sample.php config/database.php
+cp config/env.sample.php config/env.php
+```
+
+Di `config/database.php`, node `SLiMS`:
+
+```php
+'host' => '127.0.0.1',
+'database' => 'db-dev-neopustaka2',
+'port' => 3666,
+'username' => 'root',
+'password' => '<password lokal>',
+'options' => [
+    'storage_engine' => 'InnoDB'
+]
+```
+
+Di `config/env.php` set `$env` dan `$conditional_environment` ke `development`, serta `$based_on_ip` ke `false`. Mode `development` menampilkan error PHP. Di staging dan produksi biarkan `production`.
+
+### 3. Folder yang harus bisa ditulis
+
+```bash
+mkdir -p files/reports files/att images/content cache
+```
+
+PHP perlu menulis ke `files/`, `images/` (termasuk `barcodes`, `persons`, `docs`, `labels`, `cache`, `content`), `repository/`, dan `cache/`.
+
+Dump SQL tidak membawa sampul, foto anggota, atau lampiran. Salin `images/`, `files/`, dan `repository/` dari staging bila berkas itu diperlukan.
+
+### 4. Menjalankan
+
+```bash
+php -S 127.0.0.1:8080
+```
+
+Jika port 8080 sudah dipakai, ganti portnya, misalnya:
+
+```bash
+php -S 127.0.0.1:8081
+```
+
+- OPAC: `http://127.0.0.1:8081/`
+- Login petugas: `http://127.0.0.1:8081/index.php?p=login`
+
+Akun petugas sama dengan akun di staging. Membuka `/admin/` tanpa sesi akan diarahkan ke halaman login.
+
+Setelah login, cek pengaturan yang ikut terimpor dari staging supaya mesin lokal tidak mengirim email sungguhan atau menghubungi server produksi (SMTP, UCS, P2P).
+
+## Kustom
+
+Tambahan kampus sebaiknya berupa plugin di `plugins/` (lihat `plugins/README.md`) atau template, bukan suntingan inti SLiMS. `.gitignore` saat ini mengabaikan `plugins/*` dan `template/*`. Saat kode kustom pertama dibuat, longgarkan pola itu supaya kode ikut version control. `config/database.php` dan `config/env.php` tetap diabaikan.
